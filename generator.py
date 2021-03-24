@@ -233,10 +233,10 @@ def generate_build_script(path, kx_ver, uses_fabric):
     )
 
     if not kx_ver == "":
-        script.write("    id \"org.jetbrains.kotlin.plugin.serialization\" version \"$kx_ser_version\"\n")
+        script.write("    id \"org.jetbrains.kotlin.plugin.serialization\" version \"$kotlin_version\"\n")
 
     script.write(
-        """    id \"org.jetbrains.dokka\" version \"1.4.20\"
+        """    id \"org.jetbrains.dokka\" version \"$kotlin_version\"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
