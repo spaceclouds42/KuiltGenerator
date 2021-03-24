@@ -11,7 +11,7 @@ import generator
 def main():
     this_version = "1.0.0"
     latest_version = fetcher.get_latest_of_this()
-    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod")
+    print("FabriKGenerator, the simplest way to generate a Fabric Kotlin mod")
     print(f"Using version {this_version}")
     if latest_version != this_version:
         print(f"There's a newer version! Download v{latest_version} for the latest features")
