@@ -186,7 +186,7 @@ def generate_mod_json(path, mc, maven, modid, name, mod_license):
     "minecraft": """ + f"\"^{mc}\"" + """
   },
   "suggests": {
-    "flamingo": "*"
+    
   }
 }
 """
