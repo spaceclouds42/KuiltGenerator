@@ -1,6 +1,7 @@
 from re import sub
 from re import search
 from string import capwords
+from time import sleep
 
 import inputs
 import fetcher
@@ -8,7 +9,15 @@ import generator
 
 
 def main():
-    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod\n")
+    this_version = "1.0.0"
+    latest_version = fetcher.get_latest_of_this()
+    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod")
+    print(f"Using version {this_version}")
+    if latest_version != this_version:
+        print(f"There's a newer version! Download v{latest_version} for the latest features")
+        sleep(2)
+
+    print()
 
     # Inputs
     mc = inputs.minecraft_version()
