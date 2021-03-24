@@ -5,6 +5,7 @@ from os import makedirs
 from os import chdir
 from time import sleep
 from re import sub
+from json import dumps
 
 import content
 import fetcher
@@ -22,7 +23,7 @@ def generate_project(mc, uses_fabric, use_mixins, maven, modid, name, version, k
     generate_gitignore(path)
     generate_gradle_props(path, mc, uses_fabric, maven, modid, version, kt_ver, flk_ver, kx_ver)
     generate_build_script(path, kx_ver, uses_fabric)
-    generate_src(path, mc, maven, modid, name, mod_license)
+    generate_src(path, mc, maven, modid, name, mod_license, flk_ver)
     sleep(.5)
 
 
@@ -102,7 +103,7 @@ def generate_gitignore(path):
     ignore.close()
 
 
-def generate_src(path, mc, maven, modid, name, mod_license):
+def generate_src(path, mc, maven, modid, name, mod_license, flk_version):
     src_path = join(path, "src/main")
     makedirs(src_path)
 
@@ -113,11 +114,11 @@ def generate_src(path, mc, maven, modid, name, mod_license):
 
     kt_path = join(src_path, f"kotlin/{package_path}/{modid}")
     makedirs(kt_path)
-    generate_common_kt(kt_path, f"{package_path}/{modid}")
+    generate_common_kt(kt_path, f"{maven}.{modid}")
 
     resource_path = join(src_path, "resources")
     mkdir(resource_path)
-    generate_mod_json(resource_path, mc, maven, modid, name, mod_license)
+    generate_mod_json(resource_path, mc, maven, modid, name, mod_license, flk_version)
     generate_mixin_json(resource_path, modid, f"{maven}.{modid}.mixin")
     print("Finalizing..")
     assets_path = join(resource_path, f"assets/{modid}")
@@ -125,92 +126,79 @@ def generate_src(path, mc, maven, modid, name, mod_license):
     fetcher.download_icon(assets_path)
 
 
-def generate_mod_json(path, mc, maven, modid, name, mod_license):
+def generate_mod_json(path, mc, maven, modid, name, mod_license, flk_version):
     print("Generating fabric.mod.json, will require user input to complete (you can leave any of them blank)")
-    mod = open(f"{path}/fabric.mod.json", "a")
-    mod.write("{\n")
-    mod.write(
-        f"""  "schemaVersion": 1,
-  "id": "{modid}",
-  "version": """ + """"${version}",
 
-  "name": """ + f""""{name}",
-  "description": """
-    )
-    mod.write("\"" + input(f"Description for {name}: ") + "\",\n")
-    mod.write("  \"authors\": [\n    \"" + input("Author: ") + "\"\n  ],\n")
-
-    mod.write("  \"contact\": {\n")
+    description = input(f"Description of {name}: ")
+    author = input("Author: ")
     home = input("Homepage: ")
-    mod.write(f"    \"homepage\": \"{home}\",\n")
     source = input("Source Code Link: ")
-    mod.write(f"    \"sources\": \"{source}\",\n")
     issues = input("Issues Page: ")
-    mod.write(f"    \"issues\": \"{issues}\"\n")
-    mod.write("  },\n\n")
 
-    mod.write("""  "license": """)
     if mod_license.startswith("https"):
         license_name = input("Custom license detected; Please enter license name: ")
     else:
         license_name = mod_license
-    mod.write(
-        f""""{license_name}",
-  "icon": "assets/{modid}/icon.png",
 
-"""
-    )
-
-    mod.write("""  "environment": """)
     side = input("Environment (client/server/*): ").lower()
-    if side == "":
+    if side != "client" and side != "server":
         side = "*"
-    mod.write(f"\"{side}\",\n")
 
-    mod.write(
-        """
-  "entrypoints": {
-    "main": [
-      {
-        "value": """ + f"\"{maven}.{modid}.Common::INSTANCE\"" + """
-      }
-    ]
-  },
-  "mixins": [
-    """ + f"\"{modid}.mixins.json\"" + """
-  ],
-  "depends": {
-    "fabricloader": ">=0.7.1",
-    "fabric": "*",
-    "fabric-language-kotlin": "*",
-    "minecraft": """ + f"\"^{mc}\"" + """
-  },
-  "suggests": {
-    
-  }
-}
-"""
-    )
+    json = {
+        "schemaVersion": 1,
+        "id": modid,
+        "version": "${version}",
+        "name": name,
+        "description": description,
+        "authors": [
+            author
+        ],
+        "contact": {
+            "homepage": home,
+            "sources": source,
+            "issues": issues
+        },
+        "license": license_name,
+        "icon": f"assets/{modid}/icon.png",
+        "environment": side,
+        "entrypoints": {
+            "main": [
+                {
+                    "value": f"{maven}.{modid}.Common::INSTANCE"
+                }
+            ]
+        },
+        "mixins": [
+            f"{modid}.mixins.json"
+        ],
+        "depends": {
+            "fabricloader": ">=0.7.1",
+            "fabric": "*",
+            "fabric-language-kotlin": f"{flk_version}",
+            "minecraft": f"^{mc}"
+        }
+    }
 
-
+    mod = open(f"{path}/fabric.mod.json", "w")
+    mod.write(dumps(json, indent=2))
     mod.close()
 
 
-def generate_mixin_json(path, modid, package):
+def generate_mixin_json(path, modid, mixin_package):
+    json = {
+        "required": True,
+        "package": mixin_package,
+        "compatibilityLevel": "JAVA_8",
+        "mixins": [
+
+        ],
+        "injectors": {
+            "defaultRequire": 1
+        }
+    }
+
     mod = open(f"{path}/{modid}.mixins.json", "a")
-    mod.write("{\n")
-    mod.write(
-        f""""required": true,
-  "package": "{package}",
-  "compatibilityLevel": "JAVA_8",
-  "mixins": [
-  ],
-  """ + """"injectors": {
-    "defaultRequire": 1
-  }
-}
-"""
-    )
+    mod.write(dumps(json, indent=2))
     mod.close()
 
 
@@ -219,6 +207,7 @@ def generate_common_kt(path, package):
     common.write(f"package {package}")
     common.write(
         """
+
 import net.fabricmc.api.ModInitializer
 
 object Common : ModInitializer {
