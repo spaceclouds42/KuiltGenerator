@@ -86,6 +86,12 @@ def get_kx_ser():
         return data["tag_name"][1:]
 
 
+def get_dokka():
+    with urlopen(f"https://api.github.com/repos/Kotlin/dokka/releases/latest") as url:
+        data = json.loads(url.read().decode())
+        return data["tag_name"][1:]
+
+
 def get_latest_of_this():
     with urlopen(f"https://api.github.com/repos/SpaceClouds42/FabriKGenerator/releases/latest") as url:
         data = json.loads(url.read().decode())

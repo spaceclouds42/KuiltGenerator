@@ -9,7 +9,7 @@ import generator
 
 
 def main():
-    this_version = "1.0.1"
+    this_version = "1.0.2"
     latest_version = fetcher.get_latest_of_this()
     print("FabriKGenerator, the simplest way to generate a Fabric Kotlin mod")
     print(f"Using version {this_version}")

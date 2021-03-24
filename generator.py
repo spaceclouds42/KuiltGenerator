@@ -3,6 +3,7 @@ from os.path import join
 from os import mkdir
 from os import makedirs
 from os import chdir
+from os import system
 from time import sleep
 from re import sub
 from json import dumps
@@ -31,6 +32,10 @@ def generate_project(mc, uses_fabric, use_mixins, maven, modid, name, version, k
 
 def generate_static_gradle_files(path):
     fetcher.download_gradle_scripts(path)
+    try:
+        system("chmod +x gradlew")
+    except:
+        print("Could not give gradlew execute permissions\n")
 
     settings = open("settings.gradle", "w")
     settings.write(content.settings_gradle_content)
@@ -89,6 +94,7 @@ archives_base_name={modid}
 
 # Kotlin
 kotlin_version={kt_ver}
+dokka_version={fetcher.get_dokka()}
 fabric_kotlin_version={flk_ver}
 """
     )
@@ -240,7 +246,7 @@ def generate_build_script(path, kx_ver, uses_fabric):
         script.write("    id \"org.jetbrains.kotlin.plugin.serialization\" version \"$kotlin_version\"\n")
 
     script.write(
-        """    id \"org.jetbrains.dokka\" version \"$kotlin_version\"
+        """    id \"org.jetbrains.dokka\" version \"$dokka_version\"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
