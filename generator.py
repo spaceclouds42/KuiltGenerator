@@ -143,7 +143,7 @@ def generate_mod_json(path, mc, maven, modid, name, mod_license):
     source = input("Source Code Link: ")
     mod.write(f"    \"sources\": \"{source}\",\n")
     issues = input("Issues Page: ")
-    mod.write(f"    \"issues\": \"{issues}\",\n")
+    mod.write(f"    \"issues\": \"{issues}\"\n")
     mod.write("  },\n\n")
 
     mod.write("""  "license": """)
@@ -158,7 +158,7 @@ def generate_mod_json(path, mc, maven, modid, name, mod_license):
 """
     )
 
-    mod.write(""""  environment": """)
+    mod.write("""  "environment": """)
     side = input("Environment (client/server/*): ").lower()
     if side == "":
         side = "*"

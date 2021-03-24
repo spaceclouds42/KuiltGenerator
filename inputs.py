@@ -47,4 +47,4 @@ def mod_license():
     if user_input.startswith("https"):
         return user_input
     else:
-        return switch.get(user_input.lower(), "INVALID")
+        return switch.get(user_input.lower(), "UNKNOWN")
