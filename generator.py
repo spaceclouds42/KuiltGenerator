@@ -17,6 +17,8 @@ def generate_project(mc, uses_fabric, use_mixins, maven, modid, name, version, k
     chdir(path)
     print(f"Created directory {path}")
 
+    maven = sub("-", "_", maven)
+
     generate_static_gradle_files(path)
     generate_license(path, mod_license)
     generate_readme(path, name)
@@ -104,24 +106,25 @@ def generate_gitignore(path):
 
 
 def generate_src(path, mc, maven, modid, name, mod_license, flk_version):
+    flattened_id = sub("-", "_", modid)
     src_path = join(path, "src/main")
     makedirs(src_path)
 
     package_path = sub("\\.", "/", maven)
 
-    java_path = join(src_path, f"java/{package_path}/{modid}/mixin")
+    java_path = join(src_path, f"java/{package_path}/{flattened_id}/mixin")
     makedirs(java_path)
 
-    kt_path = join(src_path, f"kotlin/{package_path}/{modid}")
+    kt_path = join(src_path, f"kotlin/{package_path}/{flattened_id}")
     makedirs(kt_path)
-    generate_common_kt(kt_path, f"{maven}.{modid}")
+    generate_common_kt(kt_path, f"{maven}.{flattened_id}")
 
     resource_path = join(src_path, "resources")
     mkdir(resource_path)
     generate_mod_json(resource_path, mc, maven, modid, name, mod_license, flk_version)
-    generate_mixin_json(resource_path, modid, f"{maven}.{modid}.mixin")
+    generate_mixin_json(resource_path, flattened_id, f"{maven}.{flattened_id}.mixin")
     print("Finalizing..")
-    assets_path = join(resource_path, f"assets/{modid}")
+    assets_path = join(resource_path, f"assets/{flattened_id}")
     makedirs(assets_path)
     fetcher.download_icon(assets_path)
 
@@ -143,6 +146,7 @@ def generate_mod_json(path, mc, maven, modid, name, mod_license, flk_version):
     side = input("Environment (client/server/*): ").lower()
     if side != "client" and side != "server":
         side = "*"
+    flattened_id = sub("-", "_", modid)
 
     json = {
         "schemaVersion": 1,
@@ -159,22 +163,22 @@ def generate_mod_json(path, mc, maven, modid, name, mod_license, flk_version):
             "issues": issues
         },
         "license": license_name,
-        "icon": f"assets/{modid}/icon.png",
+        "icon": f"assets/{flattened_id}/icon.png",
         "environment": side,
         "entrypoints": {
             "main": [
                 {
-                    "value": f"{maven}.{modid}.Common::INSTANCE"
+                    "value": f"{maven}.{flattened_id}.Common::INSTANCE"
                 }
             ]
         },
         "mixins": [
-            f"{modid}.mixins.json"
+            f"{flattened_id}.mixins.json"
         ],
         "depends": {
             "fabricloader": ">=0.7.1",
             "fabric": "*",
-            "fabric-language-kotlin": f"{flk_version}",
+            "fabric-language-kotlin": f">={flk_version}",
             "minecraft": f"^{mc}"
         }
     }
