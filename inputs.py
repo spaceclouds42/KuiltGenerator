@@ -1,3 +1,6 @@
+import fetcher
+
+
 def minecraft_version():
     return input("minecraft_version: ")
 
@@ -31,8 +34,8 @@ def flk_version():
 
 
 def kx_ser_version():
-    if input("use kotlinx (y/n) ").lower().startswith("y"):
-        return input("kx_ser_version: ")
+    if input("use kotlinx serialization (y/n) ").lower().startswith("y"):
+        return fetcher.get_kx_ser()
     else:
         return ""
 

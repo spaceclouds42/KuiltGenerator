@@ -1,5 +1,6 @@
 from urllib.request import urlretrieve
 from urllib.request import urlopen
+from urllib.request import build_opener
 import json
 
 
@@ -69,3 +70,17 @@ def get_latest_loom():
 def download_icon(path):
     icon = "https://github.com/natanfudge/fabric-example-mod-kotlin/raw/master/src/main/resources/assets/modid/icon.png"
     urlretrieve(icon, f"{path}/icon.png")
+
+
+def get_kotlin():
+    opener = build_opener()
+    opener.addheaders = [("User-Agent", "Mozilla/5.0")]
+    data = opener.open("https://api.cfwidget.com/minecraft/mc-mods/fabric-language-kotlin")
+    name = json.loads(data.read().decode())["download"]["display"]
+    return name[23:]
+
+
+def get_kx_ser():
+    with urlopen(f"https://api.github.com/repos/Kotlin/kotlinx.serialization/releases/latest") as url:
+        data = json.loads(url.read().decode())
+        return data["tag_name"][1:]

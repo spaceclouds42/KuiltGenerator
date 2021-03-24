@@ -1,4 +1,5 @@
 from re import sub
+from re import search
 from string import capwords
 
 import inputs
@@ -7,21 +8,23 @@ import generator
 
 
 def main():
-    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod")
+    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod\n")
 
     # Inputs
     mc = inputs.minecraft_version()
     fabric = inputs.fabric_api()
     mixins = inputs.mixins()
-
     maven_group = inputs.maven_group()
     modid = inputs.archives_base_name()
     mod_name = capwords(sub("-", " ", modid))
     mod_version = inputs.mod_version()
+    print()
 
-    kotlin_version = inputs.kotlin_version()
-    flk_version = inputs.flk_version()
+    flk_name = fetcher.get_kotlin()
+    kotlin_version = search(""".+kotlin\.(.+)""", flk_name).group(1)
+    flk_version = flk_name
     kx_ser_version = inputs.kx_ser_version()
+    print("Fetching Kotlin versions...\n")
 
     mod_license = inputs.mod_license()
 
@@ -61,4 +64,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
