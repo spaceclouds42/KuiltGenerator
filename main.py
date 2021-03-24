@@ -1,0 +1,64 @@
+from re import sub
+from string import capwords
+
+import inputs
+import fetcher
+import generator
+
+
+def main():
+    print("FabriKGenerator, the simplest way to start generate a Fabric Kotlin mod")
+
+    # Inputs
+    mc = inputs.minecraft_version()
+    fabric = inputs.fabric_api()
+    mixins = inputs.mixins()
+
+    maven_group = inputs.maven_group()
+    modid = inputs.archives_base_name()
+    mod_name = capwords(sub("-", " ", modid))
+    mod_version = inputs.mod_version()
+
+    kotlin_version = inputs.kotlin_version()
+    flk_version = inputs.flk_version()
+    kx_ser_version = inputs.kx_ser_version()
+
+    mod_license = inputs.mod_license()
+
+    print()
+    print(f"Generating {mod_name} ({maven_group}.{modid}) v{mod_version}")
+
+    print(f"MC version {mc}", end="")
+    if fabric:
+        print(f" with fabric api version {fetcher.get_fabric_api(mc)}")
+    else:
+        print()
+
+    print(f"Kotlin version {kotlin_version}")
+    print(f"Fabrik-Language-Kotlin version {flk_version}")
+    if kx_ser_version == "":
+        print()
+    else:
+        print(f"Kotlinx serialization version {kx_ser_version}")
+
+    print(f"Using {mod_license} license")
+    print()
+
+    generator.generate_project(
+        mc=mc,
+        uses_fabric=fabric,
+        use_mixins=mixins,
+        maven=maven_group,
+        modid=modid,
+        name=mod_name,
+        version=mod_version,
+        kt_ver=kotlin_version,
+        flk_ver=flk_version,
+        kx_ver=kx_ser_version,
+        mod_license=mod_license
+    )
+
+
+if __name__ == "__main__":
+    main()
+
