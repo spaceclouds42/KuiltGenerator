@@ -4,6 +4,7 @@ from os import mkdir
 from os import makedirs
 from os import chdir
 from time import sleep
+from re import sub
 
 import content
 import fetcher
@@ -105,12 +106,14 @@ def generate_src(path, mc, maven, modid, name, mod_license):
     src_path = join(path, "src/main")
     makedirs(src_path)
 
-    java_path = join(src_path, f"java/{maven}/{modid}/mixin")
+    package_path = sub("\\.", "/", maven)
+
+    java_path = join(src_path, f"java/{package_path}/{modid}/mixin")
     makedirs(java_path)
 
-    kt_path = join(src_path, f"kotlin/{maven}/{modid}")
+    kt_path = join(src_path, f"kotlin/{package_path}/{modid}")
     makedirs(kt_path)
-    generate_common_kt(kt_path, f"{maven}.{modid}")
+    generate_common_kt(kt_path, f"{package_path}/{modid}")
 
     resource_path = join(src_path, "resources")
     mkdir(resource_path)
